@@ -2,6 +2,7 @@ import pprint
 import time
 import json
 import datetime
+import requests
 
 import aqt
 # import the main window object (mw) from aqt
@@ -86,6 +87,7 @@ def get_card_queue_str(card_queue: anki.consts.CardQueue) -> str:
 
 def print_card_data(card_id):
     card = mw.col.get_card(card_id)
+    note = card.note()
     print(f"""
 =================================
 queue: {card.queue} / {get_card_queue_str(card.queue)}
@@ -94,6 +96,7 @@ type: {card.type} / {get_card_type_str(card.type)}
 card id: {card.id}
 deck id: {card.did}
 note id: {card.nid}
+note type id: {note.mid}
 ord: {card.ord}
 ivl: {card.ivl}
 due: {card.due}
@@ -186,6 +189,57 @@ def get_card_data_fn(browser):
         
     return card_data
 
+def build_vocabai_audiocards_card_data(card_id, card_format_id):
+    card_data = get_required_card_data(card_id)
+    card_data['card_format'] = card_format_id
+    return card_data
+
+def sync_due_cards_with_audiocards():
+    # config = aqt.mw.addonManager.getConfig(__name__)
+    config = mw.addonManager.getConfig('anki-audio-cards')
+    vocabai_api_key = config['api_key']
+    
+
+    print(f'sync_with_audiocards, api_key: {vocabai_api_key}')
+    card_ids = mw.col.find_cards("deck:Mandarin is:due")
+
+    update_version = int(datetime.datetime.now().timestamp())
+    deck_subset_id = 'ae9c9e15-69a5-451c-915a-1adfb8c9d696'
+
+    card_format_id = 'b43ebbda-ad98-40e1-8e4b-67f28aa30a78'
+    deck_info = {
+        'deck_subset_id': deck_subset_id,
+        'update_version': update_version
+    }
+    max_num_cards = 1
+    processed_card_data_list = [build_vocabai_audiocards_card_data(card_id, card_format_id) for card_id in card_ids[:max_num_cards]]
+
+    request_data = {
+        'deck_info': deck_info,
+        'cards': processed_card_data_list
+    }
+
+    # url = reverse("audiocards-api:create_update_cards")
+    url = 'https://app.vocabai.dev/audiocards-api/v1/create_update_cards'
+    print(f'starting post request on {url}')
+    pprint.pprint(request_data)
+    response = requests.post(url, 
+        json=request_data, 
+        headers={
+            'Authorization': f'Api-Key {vocabai_api_key}',
+            'Content-Type': 'application/json'
+        })
+    print(f'status code: {response.status_code}')
+    if response.status_code != 200:
+        print(f'error: {response.content}')
+
+def sync_due_cards_fn(browser):
+    def sync_due_cards():
+        #card = browser.card
+        # card_id_list = browser.selectedCards()
+        sync_due_cards_with_audiocards()
+    return sync_due_cards
+
 def browerMenusInit(browser: aqt.browser.Browser):
     menu = aqt.qt.QMenu('AudioCards', browser.form.menubar)
     browser.form.menubar.addMenu(menu)
@@ -197,6 +251,11 @@ def browerMenusInit(browser: aqt.browser.Browser):
     action = aqt.qt.QAction(f'export card data', browser)
     action.triggered.connect(export_required_card_data_fn(browser))
     menu.addAction(action)
+
+    action = aqt.qt.QAction(f'sync with audiocards', browser)
+    action.triggered.connect(sync_due_cards_fn(browser))
+    menu.addAction(action)
+
 
 # create a new menu item, "test"
 action = QAction("AudioCards Test", mw)
