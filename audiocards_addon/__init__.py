@@ -216,26 +216,29 @@ def sync_due_cards_with_audiocards():
 
 
     max_num_cards = 100
-    processed_card_data_list = [build_vocabai_audiocards_card_data(card_id, card_format_id) for card_id in card_ids[:max_num_cards]]
 
-    request_data = {
-        'deck_info': deck_info,
-        'cards': processed_card_data_list
-    }
+    for i in range(0, len(card_ids), max_num_cards):
+        card_ids_slice = card_ids[i:i + max_num_cards]
+        processed_card_data_list = [build_vocabai_audiocards_card_data(card_id, card_format_id) for card_id in card_ids_slice]
 
-    # url = reverse("audiocards-api:create_update_cards")
-    url = 'https://app.vocabai.dev/audiocards-api/v1/create_update_cards'
-    print(f'starting post request on {url}')
-    pprint.pprint(request_data)
-    response = requests.post(url, 
-        json=request_data, 
-        headers={
-            'Authorization': f'Api-Key {vocabai_api_key}',
-            'Content-Type': 'application/json'
-        })
-    print(f'status code: {response.status_code}')
-    if response.status_code != 200:
-        print(f'error: {response.content}')
+        request_data = {
+            'deck_info': deck_info,
+            'cards': processed_card_data_list
+        }
+
+        # url = reverse("audiocards-api:create_update_cards")
+        url = 'https://app.vocabai.dev/audiocards-api/v1/create_update_cards'
+        print(f'starting post request on {url}')
+        pprint.pprint(request_data)
+        response = requests.post(url, 
+            json=request_data, 
+            headers={
+                'Authorization': f'Api-Key {vocabai_api_key}',
+                'Content-Type': 'application/json'
+            })
+        print(f'status code: {response.status_code}')
+        if response.status_code != 200:
+            print(f'error: {response.content}')
 
     end_time = time.time()  # Record end time
     print(f"Time taken: {end_time - start_time} seconds")
