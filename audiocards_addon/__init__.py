@@ -136,9 +136,10 @@ def get_card_reviews(card_id):
     review_times = []
     review_ratings = []
     for review in reviews:
-        review_time = datetime.datetime.fromtimestamp(review.time)
-        review_times.append(review_time.isoformat())
-        review_ratings.append(review.button_chosen)
+        if review.button_chosen != 0:
+            review_time = datetime.datetime.fromtimestamp(review.time)
+            review_times.append(review_time.isoformat())
+            review_ratings.append(review.button_chosen)
     # pprint.pprint(reviews)
     # reverse arrays
     review_times.reverse()
@@ -199,6 +200,7 @@ def sync_due_cards_with_audiocards():
     config = mw.addonManager.getConfig('anki-audio-cards')
     vocabai_api_key = config['api_key']
     
+    start_time = time.time()  # Record start time
 
     print(f'sync_with_audiocards, api_key: {vocabai_api_key}')
     card_ids = mw.col.find_cards("deck:Mandarin is:due")
@@ -211,7 +213,9 @@ def sync_due_cards_with_audiocards():
         'deck_subset_id': deck_subset_id,
         'update_version': update_version
     }
-    max_num_cards = 1
+
+
+    max_num_cards = 100
     processed_card_data_list = [build_vocabai_audiocards_card_data(card_id, card_format_id) for card_id in card_ids[:max_num_cards]]
 
     request_data = {
@@ -232,6 +236,9 @@ def sync_due_cards_with_audiocards():
     print(f'status code: {response.status_code}')
     if response.status_code != 200:
         print(f'error: {response.content}')
+
+    end_time = time.time()  # Record end time
+    print(f"Time taken: {end_time - start_time} seconds")
 
 def sync_due_cards_fn(browser):
     def sync_due_cards():
