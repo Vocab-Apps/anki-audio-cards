@@ -14,6 +14,18 @@ class DeckSubset:
     anki_card_filter: str
     anki_static_cards: bool
 
+@dataclass
+class DeckCardFormat:
+    id: str
+    anki_note_type_id: int
+    anki_card_ord: int
+
+# {
+#     "id": str(card_format_2.id),
+#     "anki_note_type_id": 445, 
+#     "anki_card_ord":0
+# }
+
 # {
 #     "id": str(deck_subset_2.id),
 #     "deck": str(deck_1.id),
@@ -47,4 +59,14 @@ class AudioCardsAPI:
         results = []
         for deck_subset_data in data:
             results.append(DeckSubset(**deck_subset_data))
+        return results
+
+    def list_deck_card_formats(self, deck_id: str):
+        url = f'{self.BASE_URL}/list_deck_card_formats/{deck_id}'
+        response = requests.get(url, headers=self.get_headers())
+        response.raise_for_status()
+        data = response.json()
+        results = []
+        for deck_card_format_data in data:
+            results.append(DeckCardFormat(**deck_card_format_data))
         return results
