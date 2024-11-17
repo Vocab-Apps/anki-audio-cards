@@ -14,6 +14,8 @@ from aqt.qt import *
 
 import anki.consts
 
+from . import logic
+
 # We're going to add a menu item below. First we want to create a function to
 # be called when the menu item is activated.
 
@@ -250,6 +252,11 @@ def sync_due_cards_fn(browser):
         sync_due_cards_with_audiocards()
     return sync_due_cards
 
+def sync_all_decks_fn(browser):
+    def sync_all_decks():
+        logic.sync_all_decks_with_audiocards()
+    return sync_all_decks
+
 def browerMenusInit(browser: aqt.browser.Browser):
     menu = aqt.qt.QMenu('AudioCards', browser.form.menubar)
     browser.form.menubar.addMenu(menu)
@@ -266,12 +273,17 @@ def browerMenusInit(browser: aqt.browser.Browser):
     action.triggered.connect(sync_due_cards_fn(browser))
     menu.addAction(action)
 
+    action = aqt.qt.QAction(f'sync all decks with audiocards', browser)
+    action.triggered.connect(sync_all_decks_fn(browser))
+    menu.addAction(action)    
 
-# create a new menu item, "test"
-action = QAction("AudioCards Test", mw)
-# set it to call testFunction when it's clicked
-qconnect(action.triggered, testFunction)
-# and add it to the tools menu
-mw.form.menuTools.addAction(action)
 
-aqt.gui_hooks.browser_menus_did_init.append(browerMenusInit)
+def setup_gui():
+    # create a new menu item, "test"
+    action = QAction("AudioCards Test", mw)
+    # set it to call testFunction when it's clicked
+    qconnect(action.triggered, testFunction)
+    # and add it to the tools menu
+    mw.form.menuTools.addAction(action)
+
+    aqt.gui_hooks.browser_menus_did_init.append(browerMenusInit)

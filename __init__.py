@@ -10,4 +10,6 @@ addon_dir = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, addon_dir)
 
 # import hypertts which should do the anki setup
-import audiocards_addon
+import audiocards_addon.gui
+
+audiocards_addon.gui.setup_gui()

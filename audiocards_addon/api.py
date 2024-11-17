@@ -61,7 +61,7 @@ class AudioCardsAPI:
             results.append(DeckSubset(**deck_subset_data))
         return results
 
-    def list_deck_card_formats(self, deck_id: str):
+    def list_deck_card_formats(self, deck_id: str) -> List[DeckCardFormat]:
         url = f'{self.BASE_URL}/list_deck_card_formats/{deck_id}'
         response = requests.get(url, headers=self.get_headers())
         response.raise_for_status()
