@@ -1,5 +1,7 @@
 import pprint
+import datetime
 from typing import List
+
 from . import anki_interface
 from . import api
 
@@ -24,6 +26,14 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
         # query existing card formats
         card_formats = audiocards_api.list_deck_card_formats(deck_subset.deck)
 
+        update_version = int(datetime.datetime.now().timestamp())
+
         # iterate over due cards
-        for card_data in anki_interface.iterate_due_cards(deck_name, card_formats):
-            pprint.pprint(card_data)
+        # for card_data in anki_interface.iterate_due_cards(deck_name, card_formats):
+        #     pprint.pprint(card_data)
+        for card_data_list in anki_interface.iterate_due_cards_slices(deck_name, card_formats, api.AudioCardsAPI.UPDATE_MAX_CARD_NUM):
+            # pprint.pprint(card_data_list)
+            response = audiocards_api.create_update_cards(deck_subset.id, update_version, card_data_list)
+            pprint.pprint(response)
+            # audiocards_api.sync_cards(card_data_list, update_version)
+            # break

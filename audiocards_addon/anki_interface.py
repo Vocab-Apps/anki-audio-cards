@@ -105,3 +105,22 @@ def iterate_due_cards(deck_name: str, card_formats):
     for card_id in card_ids:
         card_data = build_card_data(card_id, card_format_map)
         yield card_data
+
+
+def iterate_due_cards_slices(deck_name:str, card_formats, max_items):
+    # build a map of card formats
+    card_format_map = {}
+    for card_format in card_formats:
+        card_format_map[CardFormat(
+            note_type_id=card_format.anki_note_type_id, 
+            card_ord=card_format.anki_card_ord)] = card_format.id
+
+    card_ids = aqt.mw.col.find_cards(f"deck:{deck_name} is:due")
+    for i in range(0, len(card_ids), max_items):
+        card_ids_slice = card_ids[i:i + max_items]
+        card_data_list = []
+        for card_id in card_ids_slice:
+            card_data = build_card_data(card_id, card_format_map)
+            card_data_list.append(card_data)
+
+        yield card_data_list

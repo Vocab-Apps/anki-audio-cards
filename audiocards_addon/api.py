@@ -41,6 +41,7 @@ class DeckCardFormat:
 
 class AudioCardsAPI:
     BASE_URL= 'https://app.vocabai.dev/audiocards-api/v1'
+    UPDATE_MAX_CARD_NUM = 100
 
     def __init__(self, api_key):
         self.api_key = api_key
@@ -70,3 +71,19 @@ class AudioCardsAPI:
         for deck_card_format_data in data:
             results.append(DeckCardFormat(**deck_card_format_data))
         return results
+
+    def create_update_cards(self, deck_subset_id: str, update_version: int, card_data_list: List[dict]):
+        url = f'{self.BASE_URL}/create_update_cards'
+        deck_info = {
+            'deck_subset_id': deck_subset_id,
+            'update_version': update_version
+        }
+        request_data = {
+            'deck_info': deck_info,
+            'cards': card_data_list
+        }
+        response = requests.post(url, 
+            json=request_data, 
+            headers=self.get_headers())
+        response.raise_for_status()
+        return response.json()
