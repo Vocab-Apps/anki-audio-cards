@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+        "python.defaultInterpreterPath": "/home/luc/python-env/anki-audio-cards/bin/python",
+		"files.exclude": {
+			"**/__pycache__": true,
+			"**/.pytest_cache": true,
+			"**/external": true,
+			"**/web/node_modules": true
+		},
+        "editor.detectIndentation": false,
+        "editor.minimap.enabled": false
+	}
+}
