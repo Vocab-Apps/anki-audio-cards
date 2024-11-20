@@ -1,0 +1,11 @@
+session_name: audiocards
+start_directory: ./ # load session relative to config location (project root).
+shell_command_before:
+  - source ${HOME}/python-env/anki-audio-cards/bin/activate
+  - source .bash_aliases
+  - source ${HOME}/secrets/anki_audio_cards/tests.sh
+  - clear
+windows:
+- window_name: audiocards
+  focus: true
+- window_name: git
