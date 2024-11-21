@@ -282,13 +282,6 @@ def browerMenusInit(browser: aqt.browser.Browser):
 
 
 def setup_gui():
-    # create a new menu item, "test"
-    action = QAction("AudioCards Test", mw)
-    # set it to call testFunction when it's clicked
-    qconnect(action.triggered, testFunction)
-    # and add it to the tools menu
-    mw.form.menuTools.addAction(action)
-
     # browser menus
     aqt.gui_hooks.browser_menus_did_init.append(browerMenusInit)
 

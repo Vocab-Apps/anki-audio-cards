@@ -5,6 +5,10 @@ from typing import List
 from . import anki_interface
 from . import api
 
+from . import logging_utils
+
+logger = logging_utils.get_child_logger(__name__)
+
 def sync_all_decks_with_audiocards():
     # first, query the audiocards api for the list of decks
     api_key = anki_interface.get_api_key()
@@ -31,4 +35,4 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
         # iterate over due cards in slices
         for card_data_list in anki_interface.iterate_due_cards_slices(deck_name, card_formats, api.AudioCardsAPI.UPDATE_MAX_CARD_NUM):
             response = audiocards_api.create_update_cards(deck_subset.id, update_version, card_data_list)
-            pprint.pprint(response)
+            

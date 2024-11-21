@@ -5,6 +5,10 @@ from typing import List
 import aqt
 import anki
 
+from . import logging_utils
+
+logger = logging_utils.get_child_logger(__name__)
+
 @dataclass
 class Deck:
     id: int
