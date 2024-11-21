@@ -22,14 +22,17 @@ def sync_all_decks_with_audiocards():
     deck_map = anki_interface.get_deck_map()
 
     for deck_subset in deck_subset_list:
+        logger.info(f'syncing deck subset: {deck_subset}')
         anki_deck_id = deck_subset.anki_deck_id
         if anki_deck_id in deck_map:
             deck_name = deck_map[anki_deck_id]
             sync_deck(audiocards_api, deck_name, deck_subset)
+        logger.info(f'finished syncing deck subset: {deck_subset}')
 
 def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
     if deck_subset.anki_due_cards:
         # for now we only support syncing due cards
+        logger.info('configured to sync due cards')
         
         # query existing card formats
         card_formats = audiocards_api.list_deck_card_formats(deck_subset.deck)
