@@ -13,7 +13,11 @@ def sync_all_decks_with_audiocards():
     # first, query the audiocards api for the list of decks
     api_key = anki_interface.get_api_key()
     audiocards_api = api.AudioCardsAPI(api_key)
+
+    logger.info(f'configured audiocards API with API key {api_key}')
+
     deck_subset_list: List[api.DeckSubset]  = audiocards_api.list_deck_subsets()
+    logger.info(f'retrieved deck subset list: {pprint.pformat(deck_subset_list)}')
 
     deck_map = anki_interface.get_deck_map()
 

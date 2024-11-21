@@ -14,6 +14,9 @@ from aqt.qt import *
 
 import anki.consts
 
+from . import logging_utils
+logger = logging_utils.get_child_logger(__name__)
+
 from . import logic
 
 # We're going to add a menu item below. First we want to create a function to
@@ -258,6 +261,7 @@ def sync_all_decks_fn(browser):
     return sync_all_decks
 
 def sync_all_decks_action():
+    logger.info('starting to sync all decks')
     logic.sync_all_decks_with_audiocards()
 
 def browerMenusInit(browser: aqt.browser.Browser):
