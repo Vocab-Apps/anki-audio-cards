@@ -1,7 +1,12 @@
 import requests
+import pprint
 
 from typing import List
 from dataclasses import dataclass, field
+
+from . import logging_utils
+
+logger = logging_utils.get_child_logger(__name__)
 
 @dataclass
 class DeckSubset:
@@ -67,6 +72,7 @@ class AudioCardsAPI:
         response = requests.get(url, headers=self.get_headers())
         response.raise_for_status()
         data = response.json()
+        logger.debug(f'deck card format: {pprint.pformat(data)}')
         results = []
         for deck_card_format_data in data:
             results.append(DeckCardFormat(**deck_card_format_data))
@@ -82,6 +88,7 @@ class AudioCardsAPI:
             'deck_info': deck_info,
             'cards': card_data_list
         }
+        logger.info(f'calling create_update_cards API with {len(card_data_list)} cards')
         response = requests.post(url, 
             json=request_data, 
             headers=self.get_headers())
