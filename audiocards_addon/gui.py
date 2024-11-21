@@ -257,6 +257,9 @@ def sync_all_decks_fn(browser):
         logic.sync_all_decks_with_audiocards()
     return sync_all_decks
 
+def sync_all_decks_action():
+    logic.sync_all_decks_with_audiocards()
+
 def browerMenusInit(browser: aqt.browser.Browser):
     menu = aqt.qt.QMenu('AudioCards', browser.form.menubar)
     browser.form.menubar.addMenu(menu)
@@ -286,4 +289,10 @@ def setup_gui():
     # and add it to the tools menu
     mw.form.menuTools.addAction(action)
 
+    # browser menus
     aqt.gui_hooks.browser_menus_did_init.append(browerMenusInit)
+
+    # tools menu
+    action = aqt.qt.QAction(f'AudioCards: Sync All Decks', aqt.mw)
+    action.triggered.connect(sync_all_decks_action)
+    aqt.mw.form.menuTools.addAction(action)    
