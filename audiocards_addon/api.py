@@ -25,23 +25,6 @@ class DeckCardFormat:
     anki_note_type_id: int
     anki_card_ord: int
 
-# {
-#     "id": str(card_format_2.id),
-#     "anki_note_type_id": 445, 
-#     "anki_card_ord":0
-# }
-
-# {
-#     "id": str(deck_subset_2.id),
-#     "deck": str(deck_1.id),
-#     "deck_name": "Deck 1",
-#     "anki_deck_id": 12345,
-#     "name": "Subset 2",
-#     "anki_due_cards": False,
-#     "anki_card_filter": None,
-#     "anki_static_cards": True
-# }                
-
 @dataclass
 class NewDeckSubset:
     deck_name: str
@@ -49,19 +32,6 @@ class NewDeckSubset:
     anki_deck_id: int
     anki_due_cards: bool
     anki_card_filter: str = None
-
-# request_data = {
-#     'deck': deck_1.id,
-#     'anki_note_type_id': note_type_id,
-#     'anki_card_ord': anki_card_ord,
-#     'front_card_template': front_card_template,
-#     'back_card_template': back_card_template,
-#     'field_samples': {
-#         'English': ['Hello', 'Goodbye'],
-#         'French': ['Bonjour', 'Au revoir'],
-#         'Sound': ['[sound:hypertts-12345.mp3]', '[sound:hypertts-6798.mp3]']
-#     }
-# }
 
 @dataclass
 class NewCardFormat:
@@ -133,6 +103,24 @@ class AudioCardsAPI:
             'anki_due_cards': new_deck_subset.anki_due_cards,
             'anki_static_cards': False,
             'anki_card_filter': new_deck_subset.anki_card_filter
+        }
+
+        response = requests.post(url, 
+            json=request_data, 
+            headers=self.get_headers())
+        response.raise_for_status()
+        return response.json()
+
+    def create_deck_card_format(self, new_card_format: NewCardFormat):
+        url = f'{self.BASE_URL}/create_deck_card_format'
+
+        request_data = {
+            'deck': new_card_format.deck,
+            'anki_note_type_id': new_card_format.anki_note_type_id,
+            'anki_card_ord': new_card_format.anki_card_ord,
+            'front_card_template': new_card_format.front_card_template,
+            'back_card_template': new_card_format.back_card_template,
+            'field_samples': new_card_format.field_samples
         }
 
         response = requests.post(url, 

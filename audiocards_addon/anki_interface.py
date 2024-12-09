@@ -5,6 +5,7 @@ from typing import List
 import aqt
 import anki
 
+from . import api
 from . import logging_utils
 
 logger = logging_utils.get_child_logger(__name__)
@@ -97,13 +98,18 @@ def build_card_data(card_id, card_format_map):
         'review_ratings': reviews['review_ratings']
     }
 
-def iterate_due_cards(deck_name: str, card_formats):
-    # build a map of card formats
+def get_card_format_map(card_formats: List[api.DeckCardFormat]) -> dict:
     card_format_map = {}
     for card_format in card_formats:
         card_format_map[CardFormat(
             note_type_id=card_format.anki_note_type_id, 
             card_ord=card_format.anki_card_ord)] = card_format.id
+    return card_format_map
+
+def get_due_cards_browser_query(deck_name: str):
+    return f"deck:{deck_name} is:due"
+
+def iterate_due_cards(deck_name: str, card_format_map):
 
     card_ids = aqt.mw.col.find_cards(f"deck:{deck_name} is:due")
     for card_id in card_ids:
@@ -111,13 +117,7 @@ def iterate_due_cards(deck_name: str, card_formats):
         yield card_data
 
 
-def iterate_due_cards_slices(deck_name:str, card_formats, max_items):
-    # build a map of card formats
-    card_format_map = {}
-    for card_format in card_formats:
-        card_format_map[CardFormat(
-            note_type_id=card_format.anki_note_type_id, 
-            card_ord=card_format.anki_card_ord)] = card_format.id
+def iterate_due_cards_slices(deck_name:str, card_format_map, max_items):
 
     card_ids = aqt.mw.col.find_cards(f"deck:{deck_name} is:due")
     for i in range(0, len(card_ids), max_items):
@@ -128,3 +128,19 @@ def iterate_due_cards_slices(deck_name:str, card_formats, max_items):
             card_data_list.append(card_data)
 
         yield card_data_list
+
+def iterate_unkown_card_formats(browser_query: str, card_format_map):
+    reported_unknown_format_map = {}
+
+    logger.info(f'iterating unknown card formats for query: {browser_query}')
+    card_ids = aqt.mw.col.find_cards(browser_query)
+    for card_id in card_ids:
+        card = aqt.mw.col.get_card(card_id)
+        note = card.note()
+        card_format = CardFormat(note_type_id=note.mid, card_ord=card.ord)
+        if card_format not in card_format_map:
+            # found unknown card format
+            if card_format not in reported_unknown_format_map:
+                logger.info(f'unknown card format: {card_format}')
+                reported_unknown_format_map[card_format] = True
+                yield card_format

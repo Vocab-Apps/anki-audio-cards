@@ -39,14 +39,23 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
     if deck_subset.anki_due_cards:
         # for now we only support syncing due cards
         logger.info('configured to sync due cards')
-        
+
+        # get the deck browser query
+        browser_query = anki_interface.get_due_cards_browser_query(deck_name)
+
         # query existing card formats
         card_formats = audiocards_api.list_deck_card_formats(deck_subset.deck)
+        card_format_map = anki_interface.get_card_format_map(card_formats)
+
+        # do we have any unknown card formats?
+        for card_data in anki_interface.iterate_unkown_card_formats(browser_query, card_format_map):
+            logger.info(f'unknown card format: {card_data}, need to create the format')
+            return
 
         update_version = int(datetime.datetime.now().timestamp())
 
         # iterate over due cards in slices
-        for card_data_list in anki_interface.iterate_due_cards_slices(deck_name, card_formats, api.AudioCardsAPI.UPDATE_MAX_CARD_NUM):
+        for card_data_list in anki_interface.iterate_due_cards_slices(deck_name, card_format_map, api.AudioCardsAPI.UPDATE_MAX_CARD_NUM):
             response = audiocards_api.create_update_cards(deck_subset.id, update_version, card_data_list)
             
 
