@@ -42,7 +42,13 @@ class DeckCardFormat:
 #     "anki_static_cards": True
 # }                
 
-
+@dataclass
+class NewDeckSubset:
+    deck_name: str
+    deck_subset_name: str
+    anki_deck_id: int
+    anki_due_cards: bool
+    anki_card_filter: str = None
 
 class AudioCardsAPI:
     BASE_URL= 'https://app.vocabai.dev/audiocards-api/v1'

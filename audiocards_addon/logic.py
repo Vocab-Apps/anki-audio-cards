@@ -4,6 +4,7 @@ from typing import List
 
 from . import anki_interface
 from . import api
+from . import dialogs
 
 from . import logging_utils
 
@@ -43,3 +44,10 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
         for card_data_list in anki_interface.iterate_due_cards_slices(deck_name, card_formats, api.AudioCardsAPI.UPDATE_MAX_CARD_NUM):
             response = audiocards_api.create_update_cards(deck_subset.id, update_version, card_data_list)
             
+
+def register_new_deck():
+    logger.info('registering new deck')
+    deck_list: List[anki_interface.Deck] = anki_interface.get_deck_list()
+    result = dialogs.create_deck_subset(deck_list)
+    if result != None:
+        logger.info(f'create deck subset result: {pprint.pformat(result)}')

@@ -27,8 +27,8 @@ def get_api_key():
 def get_deck_list() -> List[Deck]:
     deck_list = aqt.mw.col.decks.all_names_and_ids()
     decks = []
-    for deck_id, deck_name in deck_list.items():
-        deck = Deck(id=deck_id, name=deck_name)
+    for deck in deck_list:
+        deck = Deck(id=deck.id, name=deck.name)
         decks.append(deck)
     return decks
 

@@ -264,6 +264,11 @@ def sync_all_decks_action():
     logger.info('starting to sync all decks')
     logic.sync_all_decks_with_audiocards()
 
+def register_new_deck():
+    logger.info('registering new deck')
+    logic.register_new_deck()
+
+
 def browerMenusInit(browser: aqt.browser.Browser):
     menu = aqt.qt.QMenu('AudioCards', browser.form.menubar)
     browser.form.menubar.addMenu(menu)
@@ -293,3 +298,7 @@ def setup_gui():
     action = aqt.qt.QAction(f'AudioCards: Sync All Decks', aqt.mw)
     action.triggered.connect(sync_all_decks_action)
     aqt.mw.form.menuTools.addAction(action)    
+
+    action = aqt.qt.QAction(f'AudioCards: Register New Deck', aqt.mw)
+    action.triggered.connect(register_new_deck)
+    aqt.mw.form.menuTools.addAction(action)        
