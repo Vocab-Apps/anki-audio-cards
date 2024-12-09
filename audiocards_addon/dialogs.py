@@ -64,26 +64,38 @@ class CreateDeckSubsetDialog(QDialog):
         layout.addWidget(self.filter_edit)
 
         # Connect radio buttons to enable/disable filter input
-        self.due_cards_radio.toggled.connect(
-            lambda: self.filter_edit.setEnabled(not self.due_cards_radio.isChecked())
-        )
+        self.due_cards_radio.toggled.connect(self.update_ok_button_state)
+        self.filter_radio.toggled.connect(self.update_ok_button_state)
+
+        # Connect filter input to enable/disable OK button
+        self.filter_edit.textChanged.connect(self.update_ok_button_state)
 
         # Buttons
         button_layout = QHBoxLayout()
-        ok_button = QPushButton("OK")
+        self.ok_button = QPushButton("OK")
         cancel_button = QPushButton("Cancel")
-        ok_button.clicked.connect(self.accept)
+        self.ok_button.clicked.connect(self.accept)
         cancel_button.clicked.connect(self.reject)
-        button_layout.addWidget(ok_button)
+        button_layout.addWidget(self.ok_button)
         button_layout.addWidget(cancel_button)
         layout.addLayout(button_layout)
 
         self.setLayout(layout)
 
+        # Initial OK button state
+        self.update_ok_button_state()
+
     def update_subset_name(self):
         selected_deck = self.deck_combo.currentData()
         if selected_deck:
             self.name_edit.setText(f"{selected_deck.name} Due Cards")
+
+    def update_ok_button_state(self):
+        if self.filter_radio.isChecked() and not self.filter_edit.text():
+            self.ok_button.setEnabled(False)
+        else:
+            self.ok_button.setEnabled(True)
+        self.filter_edit.setEnabled(self.filter_radio.isChecked())
 
     def accept(self):
         selected_deck = self.deck_combo.currentData()
