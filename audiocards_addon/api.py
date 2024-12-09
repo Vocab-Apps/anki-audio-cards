@@ -100,3 +100,21 @@ class AudioCardsAPI:
             headers=self.get_headers())
         response.raise_for_status()
         return response.json()
+
+    def new_deck_subset(self, new_deck_subset: NewDeckSubset):
+        url = f'{self.BASE_URL}/create_deck_subset'
+
+        request_data = {
+            'deck_name': new_deck_subset.deck_name,
+            'name': new_deck_subset.deck_subset_name,
+            'anki_deck_id': new_deck_subset.anki_deck_id,
+            'anki_due_cards': new_deck_subset.anki_due_cards,
+            'anki_static_cards': False,
+            'anki_card_filter': new_deck_subset.anki_card_filter
+        }
+
+        response = requests.post(url, 
+            json=request_data, 
+            headers=self.get_headers())
+        response.raise_for_status()
+        return response.json()

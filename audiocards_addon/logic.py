@@ -10,6 +10,11 @@ from . import logging_utils
 
 logger = logging_utils.get_child_logger(__name__)
 
+def get_api_instance():
+    api_key = anki_interface.get_api_key()
+    audiocards_api = api.AudioCardsAPI(api_key)
+    return audiocards_api    
+
 def sync_all_decks_with_audiocards():
     # first, query the audiocards api for the list of decks
     api_key = anki_interface.get_api_key()
@@ -51,3 +56,9 @@ def register_new_deck():
     result = dialogs.create_deck_subset(deck_list)
     if result != None:
         logger.info(f'create deck subset result: {pprint.pformat(result)}')
+        audiocards_api = get_api_instance()
+        try:
+            query_result = audiocards_api.new_deck_subset(result)
+            logger.info(f'created deck subset: {query_result}')
+        except Exception as e:
+            logger.error(f'error creating deck subset: {e}')
