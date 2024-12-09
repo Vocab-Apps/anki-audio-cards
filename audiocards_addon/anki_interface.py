@@ -1,6 +1,7 @@
 import datetime
+import random
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 
 import aqt
 import anki
@@ -144,3 +145,27 @@ def iterate_unkown_card_formats(browser_query: str, card_format_map):
                 logger.info(f'unknown card format: {card_format}')
                 reported_unknown_format_map[card_format] = True
                 yield card_format
+
+def get_card_templates(card_format: CardFormat):
+    note_type = aqt.mw.col.models.get(card_format.note_type_id)
+    template = note_type['tmpls'][card_format.card_ord]
+    return template['qfmt'], template['afmt']
+
+def get_card_samples(deck_name: str, card_format: CardFormat) -> Dict[str, List[str]]:
+    browser_query = f'mid:{card_format.note_type_id} deck:"{deck_name}"'
+    card_ids = aqt.mw.col.find_cards(browser_query)
+    max_samples = 100
+    selected_card_ids = random.sample(card_ids, min(max_samples, len(card_ids)))
+
+    field_samples = {}
+    for card_id in selected_card_ids:
+        card = aqt.mw.col.get_card(card_id)
+        note = card.note()
+        for field_name in note.keys():
+            if field_name not in field_samples:
+                field_samples[field_name] = []
+            field_samples[field_name].append(note[field_name])
+
+    return field_samples
+
+
