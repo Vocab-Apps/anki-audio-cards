@@ -1,7 +1,7 @@
 import requests
 import pprint
 
-from typing import List
+from typing import List, Dict
 from dataclasses import dataclass, field
 
 from . import logging_utils
@@ -49,6 +49,28 @@ class NewDeckSubset:
     anki_deck_id: int
     anki_due_cards: bool
     anki_card_filter: str = None
+
+# request_data = {
+#     'deck': deck_1.id,
+#     'anki_note_type_id': note_type_id,
+#     'anki_card_ord': anki_card_ord,
+#     'front_card_template': front_card_template,
+#     'back_card_template': back_card_template,
+#     'field_samples': {
+#         'English': ['Hello', 'Goodbye'],
+#         'French': ['Bonjour', 'Au revoir'],
+#         'Sound': ['[sound:hypertts-12345.mp3]', '[sound:hypertts-6798.mp3]']
+#     }
+# }
+
+@dataclass
+class NewCardFormat:
+    deck: str  # deck_id
+    anki_note_type_id: int
+    anki_card_ord: int
+    front_card_template: str
+    back_card_template: str
+    field_samples: Dict[str, List[str]]
 
 class AudioCardsAPI:
     BASE_URL= 'https://app.vocabai.dev/audiocards-api/v1'
