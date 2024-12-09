@@ -39,10 +39,13 @@ class CreateDeckSubsetDialog(QDialog):
         name_layout = QHBoxLayout()
         name_label = QLabel("Deck Subset name:")
         self.name_edit = QLineEdit()
-        self.name_edit.textChanged.connect(self.update_ok_button_state)
         name_layout.addWidget(name_label)
         name_layout.addWidget(self.name_edit)
         layout.addLayout(name_layout)
+
+        # Set initial deck subset name
+        if self.decks:
+            self.name_edit.setText(f"{self.decks[0].name} Due Cards")
 
         # Card selection method
         self.due_cards_radio = QRadioButton("Due cards")
@@ -61,11 +64,9 @@ class CreateDeckSubsetDialog(QDialog):
         layout.addWidget(self.filter_edit)
 
         # Connect radio buttons to enable/disable filter input
-        self.due_cards_radio.toggled.connect(self.update_ok_button_state)
-        self.filter_radio.toggled.connect(self.update_ok_button_state)
+        self.due_cards_radio.toggled.connect(self.update_subset_name)
+        self.filter_radio.toggled.connect(self.update_subset_name)
 
-        # Connect filter input to enable/disable OK button
-        self.filter_edit.textChanged.connect(self.update_ok_button_state)
 
         # Buttons
         button_layout = QHBoxLayout()
@@ -79,18 +80,21 @@ class CreateDeckSubsetDialog(QDialog):
 
         self.setLayout(layout)
 
+        self.name_edit.textChanged.connect(self.update_ok_button_state)
+
+        # Connect filter input to enable/disable OK button
+        self.filter_edit.textChanged.connect(self.update_ok_button_state)        
+
         # Initial OK button state
         self.update_ok_button_state()
-
-        # Set initial deck subset name
-        if self.decks:
-            self.name_edit.setText(f"{self.decks[0].name} Due Cards")
-
 
     def update_subset_name(self):
         selected_deck = self.deck_combo.currentData()
         if selected_deck:
-            self.name_edit.setText(f"{selected_deck.name} Due Cards")
+            if self.due_cards_radio.isChecked():
+                self.name_edit.setText(f"{selected_deck.name} Due Cards")
+            elif self.filter_radio.isChecked():
+                self.name_edit.setText(f"{selected_deck.name} Filtered")
 
     def update_ok_button_state(self):
         if self.filter_radio.isChecked() and not self.filter_edit.text():
