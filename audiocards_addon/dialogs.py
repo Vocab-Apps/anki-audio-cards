@@ -30,6 +30,7 @@ class CreateDeckSubsetDialog(QDialog):
         self.deck_combo = QComboBox()
         for deck in self.decks:
             self.deck_combo.addItem(deck.name, deck)
+        self.deck_combo.currentIndexChanged.connect(self.update_subset_name)
         deck_layout.addWidget(deck_label)
         deck_layout.addWidget(self.deck_combo)
         layout.addLayout(deck_layout)
@@ -74,6 +75,11 @@ class CreateDeckSubsetDialog(QDialog):
         layout.addLayout(button_layout)
 
         self.setLayout(layout)
+
+    def update_subset_name(self):
+        selected_deck = self.deck_combo.currentData()
+        if selected_deck:
+            self.name_edit.setText(f"{selected_deck.name} Due Cards")
 
     def accept(self):
         selected_deck = self.deck_combo.currentData()
