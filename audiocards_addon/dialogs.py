@@ -39,13 +39,10 @@ class CreateDeckSubsetDialog(QDialog):
         name_layout = QHBoxLayout()
         name_label = QLabel("Deck Subset name:")
         self.name_edit = QLineEdit()
+        self.name_edit.textChanged.connect(self.update_ok_button_state)
         name_layout.addWidget(name_label)
         name_layout.addWidget(self.name_edit)
         layout.addLayout(name_layout)
-
-        # Set initial deck subset name
-        if self.decks:
-            self.name_edit.setText(f"{self.decks[0].name} Due Cards")
 
         # Card selection method
         self.due_cards_radio = QRadioButton("Due cards")
@@ -85,6 +82,11 @@ class CreateDeckSubsetDialog(QDialog):
         # Initial OK button state
         self.update_ok_button_state()
 
+        # Set initial deck subset name
+        if self.decks:
+            self.name_edit.setText(f"{self.decks[0].name} Due Cards")
+
+
     def update_subset_name(self):
         selected_deck = self.deck_combo.currentData()
         if selected_deck:
@@ -92,6 +94,8 @@ class CreateDeckSubsetDialog(QDialog):
 
     def update_ok_button_state(self):
         if self.filter_radio.isChecked() and not self.filter_edit.text():
+            self.ok_button.setEnabled(False)
+        elif not self.name_edit.text():
             self.ok_button.setEnabled(False)
         else:
             self.ok_button.setEnabled(True)
