@@ -43,6 +43,10 @@ class CreateDeckSubsetDialog(QDialog):
         name_layout.addWidget(self.name_edit)
         layout.addLayout(name_layout)
 
+        # Set initial deck subset name
+        if self.decks:
+            self.name_edit.setText(f"{self.decks[0].name} Due Cards")
+
         # Card selection method
         self.due_cards_radio = QRadioButton("Due cards")
         self.filter_radio = QRadioButton("Card filter")
