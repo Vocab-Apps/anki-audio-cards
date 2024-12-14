@@ -4,6 +4,8 @@ import time
 import anki
 import aqt
 
+from . import anki_interface
+
 def get_card_type_str(card_type):
     if card_type == anki.consts.CARD_TYPE_NEW:
         return "new"
@@ -64,6 +66,10 @@ odid: {card.odid}
         now = time.time()
         seconds = card.due - now
         print(f"due in {seconds} seconds")
+
+    # compute the due time according to the logic we have when feeding into AudioCards
+    card_due_time_dt = anki_interface.get_card_due_time_dt(card)
+    print(f'due time: {card_due_time_dt}')
 
 def get_card_due_time_dt(card):
     if card.type == anki.consts.CARD_TYPE_NEW:
