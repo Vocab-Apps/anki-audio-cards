@@ -68,8 +68,9 @@ odid: {card.odid}
         print(f"due in {seconds} seconds")
 
     # compute the due time according to the logic we have when feeding into AudioCards
-    card_due_time_dt = anki_interface.get_card_due_time_dt(card)
-    print(f'due time: {card_due_time_dt}')
+    if card.type != anki.consts.CARD_TYPE_NEW:
+        card_due_time_dt = anki_interface.get_card_due_time_dt(card)
+        print(f'due time: {card_due_time_dt}')
 
 def get_card_due_time_dt(card):
     if card.type == anki.consts.CARD_TYPE_NEW:

@@ -42,10 +42,7 @@ def get_deck_map():
     return deck_map
 
 def get_card_due_time_dt(card):
-    if card.type == anki.consts.CARD_TYPE_NEW:
-        # probably need to create due time
-        return None
-    elif card.type in [anki.consts.CARD_TYPE_LRN, anki.consts.CARD_TYPE_RELEARNING]:
+    if card.type in [anki.consts.CARD_TYPE_LRN, anki.consts.CARD_TYPE_RELEARNING]:
         due_time_dt = datetime.datetime.fromtimestamp(card.due)
         return due_time_dt
     elif card.type == anki.consts.CARD_TYPE_REV:
@@ -79,8 +76,6 @@ def get_card_reviews(card_id):
 
 def build_card_data(card_id, card_format_map):
     card = aqt.mw.col.get_card(card_id)
-    due_time_dt = get_card_due_time_dt(card)
-    due_time_iso = due_time_dt.isoformat()
     reviews = get_card_reviews(card_id)
     note = card.note()
     # fields = note._fmap
@@ -89,15 +84,24 @@ def build_card_data(card_id, card_format_map):
     card_format_id = card_format_map[card_format]
 
     fields_dict = dict(zip(note.keys(), note.values()))
-    return {
+    card_data = {
         'anki_card_id': card.id,
         'card_format': card_format_id,
         'fields': fields_dict,
         'card_type': card.type,
-        'due_time': due_time_iso,
         'review_times': reviews['review_times'],
         'review_ratings': reviews['review_ratings']
     }
+
+    if card.type != anki.consts.CARD_TYPE_NEW:
+        due_time_dt = get_card_due_time_dt(card)
+        due_time_iso = due_time_dt.isoformat()
+        card_data['due_time'] = due_time_iso
+    else:
+        # new card, populate new_rank
+        card_data['new_rank'] = card.due
+
+    return card_data
 
 def get_card_format_map(card_formats: List[api.DeckCardFormat]) -> dict:
     card_format_map = {}
@@ -108,7 +112,9 @@ def get_card_format_map(card_formats: List[api.DeckCardFormat]) -> dict:
     return card_format_map
 
 def get_due_cards_browser_query(deck_name: str):
-    return f"deck:{deck_name} is:due"
+    # this retrieves due cards and new cards, and excludes suspended/buried cards
+    # deck:Mandarin (is:due OR is:new) -is:suspended -is:buried
+    return f"deck:{deck_name} (is:due OR is:new) -is:suspended -is:buried"
 
 def iterate_due_cards(deck_name: str, card_format_map):
 
@@ -120,7 +126,8 @@ def iterate_due_cards(deck_name: str, card_format_map):
 
 def iterate_due_cards_slices(deck_name:str, card_format_map, max_items):
 
-    card_ids = aqt.mw.col.find_cards(f"deck:{deck_name} is:due")
+    browser_query = get_due_cards_browser_query(deck_name)
+    card_ids = aqt.mw.col.find_cards(browser_query)
     for i in range(0, len(card_ids), max_items):
         card_ids_slice = card_ids[i:i + max_items]
         card_data_list = []

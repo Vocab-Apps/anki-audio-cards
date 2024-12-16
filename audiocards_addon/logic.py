@@ -42,6 +42,7 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
 
         # get the deck browser query
         browser_query = anki_interface.get_due_cards_browser_query(deck_name)
+        logger.info(f'browser query: [{browser_query}]')
 
         # query existing card formats
         card_formats = audiocards_api.list_deck_card_formats(deck_subset.deck)
