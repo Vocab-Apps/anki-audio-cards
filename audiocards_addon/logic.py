@@ -74,6 +74,7 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
 
         # iterate over due cards in slices
         for card_data_list in anki_interface.iterate_due_cards_slices(deck_name, card_format_map, api.AudioCardsAPI.UPDATE_MAX_CARD_NUM):
+            logger.debug(f'detailed card data: {pprint.pformat(card_data_list)}')
             response = audiocards_api.create_update_cards(deck_subset.id, update_version, card_data_list)
             
 

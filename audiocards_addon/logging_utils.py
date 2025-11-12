@@ -97,7 +97,7 @@ def get_file_handler(filename):
 def configure_logging(LOGGING_MODE_ENV_VAR, LOGGING_FILE_ENV_VAR, LOGGING_LEVEL_ENV_VAR):
     logging_mode: LoggingMode = LoggingMode[os.environ.get(LOGGING_MODE_ENV_VAR, LoggingMode.SILENT.value)]
     logging_file: str = os.environ.get(LOGGING_FILE_ENV_VAR, '')
-    logging_level_str: str = os.environ.get(LOGGING_LEVEL_ENV_VAR, 'INFO')
+    logging_level_str: str = os.environ.get(LOGGING_LEVEL_ENV_VAR, 'DEBUG')
     logging_level: int = getattr(logging, logging_level_str.upper(), logging.INFO)
 
     if logging_mode == LoggingMode.CONSOLE:
