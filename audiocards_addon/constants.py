@@ -6,3 +6,8 @@ ENV_VAR_LOGGING_LEVEL = 'AUDIOCARDS_LOGGING_LEVEL'
 
 LOGGER_NAME = 'audiocards'
 LOGGER_NAME_TEST = 'test_audiocards'
+
+# maximum number of days ahead when looking for due cards
+MAX_DAYS_AHEAD = 10
+# minimum number of cards we want in a due set
+MIN_CARDS = 100

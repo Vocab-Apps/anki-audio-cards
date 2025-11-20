@@ -5,6 +5,7 @@ from typing import List
 from . import anki_interface
 from . import api
 from . import dialogs
+from . import constants
 
 from . import logging_utils
 
@@ -41,7 +42,7 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
         logger.info('configured to sync due cards')
 
         # get the deck browser query
-        browser_query = anki_interface.get_due_cards_browser_query(deck_name)
+        browser_query = anki_interface.get_due_cards_browser_query(deck_name, constants.MAX_DAYS_AHEAD)
         logger.info(f'browser query: [{browser_query}]')
 
         # query existing card formats

@@ -8,6 +8,7 @@ import anki
 
 from . import api
 from . import logging_utils
+from . import constants
 
 logger = logging_utils.get_child_logger(__name__)
 
@@ -111,23 +112,30 @@ def get_card_format_map(card_formats: List[api.DeckCardFormat]) -> dict:
             card_ord=card_format.anki_card_ord)] = card_format.id
     return card_format_map
 
-def get_due_cards_browser_query(deck_name: str):
+def get_due_cards_browser_query(deck_name: str, days_ahead: int) -> str:
     # this retrieves due cards and new cards, and excludes suspended/buried cards
-    # deck:Mandarin (is:due OR is:new) -is:suspended -is:buried
-    return f"deck:{deck_name} (is:due OR is:new) -is:suspended -is:buried"
-
-def iterate_due_cards(deck_name: str, card_format_map):
-
-    card_ids = aqt.mw.col.find_cards(f"deck:{deck_name} is:due")
-    for card_id in card_ids:
-        card_data = build_card_data(card_id, card_format_map)
-        yield card_data
+    # deck:Cantonese (is:due OR is:new OR prop:due<=0) -is:suspended -is:buried
+    return f"deck:{deck_name} (is:due OR is:new OR prop:due<={days_ahead}) -is:suspended -is:buried"
 
 
 def iterate_due_cards_slices(deck_name:str, card_format_map, max_items):
 
-    browser_query = get_due_cards_browser_query(deck_name)
-    card_ids = aqt.mw.col.find_cards(browser_query)
+    keep_searching = True
+
+    # find due cards, expanding days_ahead until we have at least MIN_CARDS or reach MAX_DAYS_AHEAD
+    # the idea is we always want to have at least 100 cards, otherwise it will be too little to generate
+    # audio, and we'll have too much repetition.
+    days_ahead = 0
+    while keep_searching:
+        browser_query = get_due_cards_browser_query(deck_name, days_ahead)
+        logger.info(f'fetching due cards with query: {browser_query}')
+        card_ids = aqt.mw.col.find_cards(browser_query)
+        if len(card_ids) >= constants.MIN_CARDS:
+            keep_searching = False
+        if days_ahead >= constants.MAX_DAYS_AHEAD:
+            keep_searching = False
+        days_ahead += 1
+
     for i in range(0, len(card_ids), max_items):
         card_ids_slice = card_ids[i:i + max_items]
         card_data_list = []
