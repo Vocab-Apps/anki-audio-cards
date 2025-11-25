@@ -28,15 +28,18 @@ def sync_all_decks_with_audiocards():
 
     deck_map = anki_interface.get_deck_map()
 
+    # compute update_version once for all decks for consistency
+    update_version = int(datetime.datetime.now().timestamp())
+
     for deck_subset in deck_subset_list:
         logger.info(f'syncing deck subset: {deck_subset}')
         anki_deck_id = deck_subset.anki_deck_id
         if anki_deck_id in deck_map:
             deck_name = deck_map[anki_deck_id]
-            sync_deck(audiocards_api, deck_name, deck_subset)
+            sync_deck(audiocards_api, deck_name, deck_subset, update_version)
         logger.info(f'finished syncing deck subset: {deck_subset}')
 
-def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
+def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset, update_version: int):
     if deck_subset.anki_due_cards:
         # for now we only support syncing due cards
         logger.info('configured to sync due cards')
@@ -69,9 +72,7 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset):
 
         # now, refresh the card formats
         card_formats = audiocards_api.list_deck_card_formats(deck_subset.deck)
-        card_format_map = anki_interface.get_card_format_map(card_formats)        
-
-        update_version = int(datetime.datetime.now().timestamp())
+        card_format_map = anki_interface.get_card_format_map(card_formats)
 
         # iterate over due cards in slices
         for card_data_list in anki_interface.iterate_due_cards_slices(deck_name, card_format_map, api.AudioCardsAPI.UPDATE_MAX_CARD_NUM):
