@@ -31,13 +31,23 @@ def sync_all_decks_with_audiocards():
     # compute update_version once for all decks for consistency
     update_version = int(datetime.datetime.now().timestamp())
 
-    for deck_subset in deck_subset_list:
-        logger.info(f'syncing deck subset: {deck_subset}')
-        anki_deck_id = deck_subset.anki_deck_id
-        if anki_deck_id in deck_map:
-            deck_name = deck_map[anki_deck_id]
-            sync_deck(audiocards_api, deck_name, deck_subset, update_version)
-        logger.info(f'finished syncing deck subset: {deck_subset}')
+    # signal in_progress status before starting
+    audiocards_api.deck_update(api.DeckUpdateStatus.IN_PROGRESS, update_version)
+
+    try:
+        for deck_subset in deck_subset_list:
+            logger.info(f'syncing deck subset: {deck_subset}')
+            anki_deck_id = deck_subset.anki_deck_id
+            if anki_deck_id in deck_map:
+                deck_name = deck_map[anki_deck_id]
+                sync_deck(audiocards_api, deck_name, deck_subset, update_version)
+            logger.info(f'finished syncing deck subset: {deck_subset}')
+
+        # signal done status after all decks are synced
+        audiocards_api.deck_update(api.DeckUpdateStatus.DONE, update_version)
+    except Exception as e:
+        logger.error(f'error syncing decks: {e}')
+        audiocards_api.deck_update(api.DeckUpdateStatus.ERROR, update_version, str(e))
 
 def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset, update_version: int):
     if deck_subset.anki_due_cards:

@@ -8,6 +8,11 @@ from . import logging_utils
 
 logger = logging_utils.get_child_logger(__name__)
 
+class DeckUpdateStatus:
+    IN_PROGRESS = 'in_progress'
+    ERROR = 'error'
+    DONE = 'done'
+
 @dataclass
 class DeckSubset:
     id: str
@@ -123,8 +128,23 @@ class AudioCardsAPI:
             'field_samples': new_card_format.field_samples
         }
 
-        response = requests.post(url, 
-            json=request_data, 
+        response = requests.post(url,
+            json=request_data,
+            headers=self.get_headers())
+        response.raise_for_status()
+        return response.json()
+
+    def deck_update(self, status: str, update_version: int, error_message: str = None):
+        url = f'{self.BASE_URL}/deck_update'
+        request_data = {
+            'status': status,
+            'update_version': update_version
+        }
+        if error_message is not None:
+            request_data['error_message'] = error_message
+        logger.info(f'calling deck_update API with status={status}, update_version={update_version}')
+        response = requests.patch(url,
+            json=request_data,
             headers=self.get_headers())
         response.raise_for_status()
         return response.json()
