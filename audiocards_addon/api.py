@@ -50,7 +50,8 @@ class NewCardFormat:
     field_samples: Dict[str, List[str]]
 
 class AudioCardsAPI:
-    BASE_URL= os.environ.get('ANKI_LANGUAGE_TOOLS_VOCABAI_BASE_URL', constants.VOCABAI_API_BASE_URL)
+    VOCABAI_APP_HOSTNAME = os.environ.get('VOCABAI_API_HOSTNAME', constants.VOCABAI_API_HOSTNAME)
+    BASE_URL= f'https://{VOCABAI_APP_HOSTNAME}/audiocards-api/v1'
     UPDATE_MAX_CARD_NUM = 100
 
     def __init__(self, api_key):
@@ -130,9 +131,13 @@ class AudioCardsAPI:
             'field_samples': new_card_format.field_samples
         }
 
+        logger.info(f'create_deck_card_format {pprint.pformat(request_data)}')
+
         response = requests.post(url,
             json=request_data,
             headers=self.get_headers())
+        if response.status_code != 201:
+            logger.error(f'error creating deck card format: {response.status_code} {response.text}')
         response.raise_for_status()
         return response.json()
 

@@ -46,8 +46,9 @@ def sync_all_decks_with_audiocards():
         # signal done status after all decks are synced
         audiocards_api.deck_update(api.DeckUpdateStatus.DONE, update_version)
     except Exception as e:
-        logger.error(f'error syncing decks: {e}')
+        logger.exception(f'error syncing decks: {e}')
         audiocards_api.deck_update(api.DeckUpdateStatus.ERROR, update_version, str(e))
+        raise e
 
 def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset, update_version: int):
     if deck_subset.anki_due_cards:
