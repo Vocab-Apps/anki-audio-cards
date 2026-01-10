@@ -1,10 +1,12 @@
 import requests
 import pprint
+import os
 
 from typing import List, Dict
 from dataclasses import dataclass, field
 
 from . import logging_utils
+from . import constants
 
 logger = logging_utils.get_child_logger(__name__)
 
@@ -48,7 +50,7 @@ class NewCardFormat:
     field_samples: Dict[str, List[str]]
 
 class AudioCardsAPI:
-    BASE_URL= 'https://app.vocabai.dev/audiocards-api/v1'
+    BASE_URL= os.environ.get('ANKI_LANGUAGE_TOOLS_VOCABAI_BASE_URL', constants.VOCABAI_API_BASE_URL)
     UPDATE_MAX_CARD_NUM = 100
 
     def __init__(self, api_key):
