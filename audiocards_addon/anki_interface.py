@@ -164,7 +164,7 @@ def iterate_unkown_card_formats(browser_query: str, card_format_map):
 def get_card_templates(card_format: CardFormat):
     note_type = aqt.mw.col.models.get(card_format.note_type_id)
     template = note_type['tmpls'][card_format.card_ord]
-    return template['qfmt'], template['afmt']
+    return template['name'], template['qfmt'], template['afmt']
 
 def get_card_samples(deck_name: str, card_format: CardFormat) -> List[Dict[str, str]]:
     browser_query = f'mid:{card_format.note_type_id} deck:"{deck_name}"'

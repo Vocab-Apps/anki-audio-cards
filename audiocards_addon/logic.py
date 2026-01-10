@@ -66,13 +66,14 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset, updat
         # do we have any unknown card formats?
         for card_format in anki_interface.iterate_unkown_card_formats(browser_query, card_format_map):
             logger.info(f'unknown card format: {card_format}, need to create the format')
-            front_template, back_template = anki_interface.get_card_templates(card_format)
+            template_name, front_template, back_template = anki_interface.get_card_templates(card_format)
             field_samples = anki_interface.get_card_samples(deck_name, card_format)
             # logger.info(f'front template: {front_template}, back template: {back_template}')
             new_card_format: api.NewCardFormat = api.NewCardFormat(
                 deck=deck_subset.deck,
                 anki_note_type_id=card_format.note_type_id,
                 anki_card_ord=card_format.card_ord,
+                template_name=template_name,
                 front_card_template=front_template,
                 back_card_template=back_template,
                 field_samples=field_samples

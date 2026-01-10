@@ -45,9 +45,10 @@ class NewCardFormat:
     deck: str  # deck_id
     anki_note_type_id: int
     anki_card_ord: int
+    template_name: str
     front_card_template: str
     back_card_template: str
-    field_samples: Dict[str, List[str]]
+    field_samples: List[Dict[str, str]]
 
 class AudioCardsAPI:
     VOCABAI_APP_HOSTNAME = os.environ.get('VOCABAI_API_HOSTNAME', constants.VOCABAI_API_HOSTNAME)
@@ -126,6 +127,7 @@ class AudioCardsAPI:
             'deck': new_card_format.deck,
             'anki_note_type_id': new_card_format.anki_note_type_id,
             'anki_card_ord': new_card_format.anki_card_ord,
+            'template_name': new_card_format.template_name,
             'front_card_template': new_card_format.front_card_template,
             'back_card_template': new_card_format.back_card_template,
             'field_samples': new_card_format.field_samples
