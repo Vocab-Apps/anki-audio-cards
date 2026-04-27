@@ -92,15 +92,14 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset, updat
             response = audiocards_api.create_update_cards(deck_subset.id, update_version, card_data_list)
             
 
-def register_new_deck():
+def get_new_deck_subset_from_dialog():
     logger.info('registering new deck')
     deck_list: List[anki_interface.Deck] = anki_interface.get_deck_list()
-    result = dialogs.create_deck_subset(deck_list)
-    if result != None:
-        logger.info(f'create deck subset result: {pprint.pformat(result)}')
-        audiocards_api = get_api_instance()
-        try:
-            query_result = audiocards_api.new_deck_subset(result)
-            logger.info(f'created deck subset: {query_result}')
-        except Exception as e:
-            logger.error(f'error creating deck subset: {e}')
+    return dialogs.create_deck_subset(deck_list)
+
+def create_deck_subset(new_deck_subset):
+    logger.info(f'create deck subset result: {pprint.pformat(new_deck_subset)}')
+    audiocards_api = get_api_instance()
+    query_result = audiocards_api.new_deck_subset(new_deck_subset)
+    logger.info(f'created deck subset: {query_result}')
+    return query_result

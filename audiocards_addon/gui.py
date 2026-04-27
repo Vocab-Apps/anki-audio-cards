@@ -9,6 +9,7 @@ import aqt
 from aqt import mw
 # import the "show info" tool from utils.py
 from aqt.utils import showInfo, qconnect
+from aqt.operations import QueryOp
 # import all of the Qt GUI library
 from aqt.qt import *
 
@@ -28,11 +29,25 @@ def sync_all_decks_fn(browser):
 
 def sync_all_decks_action():
     logger.info('starting to sync all decks')
-    logic.sync_all_decks_with_audiocards()
+    op = QueryOp(
+        parent=mw,
+        op=lambda col: logic.sync_all_decks_with_audiocards(),
+        success=lambda result: None,
+    )
+    op.with_progress(label='Syncing all decks with AudioCards...').run_in_background()
 
 def register_new_deck():
     logger.info('registering new deck')
-    logic.register_new_deck()
+    new_deck_subset = logic.get_new_deck_subset_from_dialog()
+    if new_deck_subset is None:
+        return
+
+    op = QueryOp(
+        parent=mw,
+        op=lambda col: logic.create_deck_subset(new_deck_subset),
+        success=lambda result: None,
+    )
+    op.with_progress(label='Registering new deck with AudioCards...').run_in_background()
 
 
 def browerMenusInit(browser: aqt.browser.Browser):
