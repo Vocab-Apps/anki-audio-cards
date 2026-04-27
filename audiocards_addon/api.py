@@ -57,6 +57,7 @@ class AudioCardsAPI:
 
     def __init__(self, api_key):
         self.api_key = api_key
+        logger.info(f'using AudioCards API hostname: {self.VOCABAI_APP_HOSTNAME}')
 
     def get_headers(self):
         return {
