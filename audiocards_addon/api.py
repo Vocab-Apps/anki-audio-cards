@@ -158,3 +158,35 @@ class AudioCardsAPI:
             headers=self.get_headers())
         response.raise_for_status()
         return response.json()
+
+
+def validate_api_key(api_key: str):
+    if not api_key:
+        return False, 'API key is empty'
+    hostname = AudioCardsAPI.VOCABAI_APP_HOSTNAME
+    url = f'https://{hostname}/languagetools-api/v5/account'
+    headers = {'Authorization': f'Api-Key {api_key}'}
+    logger.info(f'validating API key against {url}')
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+    except requests.exceptions.RequestException as e:
+        logger.warning(f'API key validation request failed: {e}')
+        return False, f'Connection error: {e}'
+    if response.status_code == 200:
+        try:
+            data = response.json()
+        except ValueError:
+            data = None
+        logger.info(f'API key validation succeeded: {data}')
+        if isinstance(data, dict):
+            email = data.get('email') or data.get('user_email')
+            account_type = data.get('type') or data.get('account_type')
+            parts = [p for p in [email, account_type] if p]
+            if parts:
+                return True, 'API key is valid (' + ', '.join(parts) + ')'
+        return True, 'API key is valid'
+    if response.status_code in (401, 403):
+        logger.info(f'API key rejected by server: {response.status_code}')
+        return False, 'API key is invalid'
+    logger.warning(f'API key validation got unexpected status {response.status_code}: {response.text}')
+    return False, f'Unexpected response (HTTP {response.status_code})'

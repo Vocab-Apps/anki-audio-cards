@@ -27,6 +27,11 @@ def get_api_key():
     vocabai_api_key = config['api_key']
     return vocabai_api_key
 
+def set_api_key(api_key: str):
+    config = aqt.mw.addonManager.getConfig('anki-audio-cards') or {}
+    config['api_key'] = api_key
+    aqt.mw.addonManager.writeConfig('anki-audio-cards', config)
+
 def get_deck_list() -> List[Deck]:
     deck_list = aqt.mw.col.decks.all_names_and_ids()
     decks = []

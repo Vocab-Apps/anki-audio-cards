@@ -124,4 +124,64 @@ def create_deck_subset(decks: List[anki_interface.Deck], parent=None) -> Optiona
     return None
 
 
+class SettingsDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.setWindowTitle("AudioCards: Settings")
+        layout = QVBoxLayout()
+
+        api_key_layout = QHBoxLayout()
+        api_key_label = QLabel("API key:")
+        self.api_key_edit = QLineEdit()
+        self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self.api_key_edit.setText(anki_interface.get_api_key() or "")
+        api_key_layout.addWidget(api_key_label)
+        api_key_layout.addWidget(self.api_key_edit)
+        layout.addLayout(api_key_layout)
+
+        validate_layout = QHBoxLayout()
+        self.validate_button = QPushButton("Validate")
+        self.validate_button.clicked.connect(self._on_validate)
+        self.status_label = QLabel("")
+        validate_layout.addWidget(self.validate_button)
+        validate_layout.addWidget(self.status_label)
+        layout.addLayout(validate_layout)
+
+        button_layout = QHBoxLayout()
+        ok_button = QPushButton("OK")
+        cancel_button = QPushButton("Cancel")
+        ok_button.clicked.connect(self.accept)
+        cancel_button.clicked.connect(self.reject)
+        button_layout.addWidget(ok_button)
+        button_layout.addWidget(cancel_button)
+        layout.addLayout(button_layout)
+
+        self.setLayout(layout)
+
+    def _on_validate(self):
+        self.validate_button.setEnabled(False)
+        self.status_label.setStyleSheet("")
+        self.status_label.setText("Validating…")
+        aqt.mw.app.processEvents()
+        try:
+            ok, message = api.validate_api_key(self.api_key_edit.text().strip())
+        finally:
+            self.validate_button.setEnabled(True)
+        color = "green" if ok else "red"
+        self.status_label.setStyleSheet(f"color: {color};")
+        self.status_label.setText(message)
+
+    def accept(self):
+        anki_interface.set_api_key(self.api_key_edit.text().strip())
+        super().accept()
+
+
+def show_settings(parent=None):
+    dialog = SettingsDialog(parent)
+    dialog.exec()
+
+
 

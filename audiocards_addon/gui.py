@@ -49,6 +49,11 @@ def register_new_deck():
     )
     op.with_progress(label='Registering new deck with AudioCards...').run_in_background()
 
+def show_settings_action():
+    logger.info('opening settings dialog')
+    from . import dialogs
+    dialogs.show_settings(parent=aqt.mw)
+
 
 def browerMenusInit(browser: aqt.browser.Browser):
     menu = aqt.qt.QMenu('AudioCards', browser.form.menubar)
@@ -74,4 +79,8 @@ def setup_gui():
 
     action = aqt.qt.QAction(f'AudioCards: Register New Deck', aqt.mw)
     action.triggered.connect(register_new_deck)
-    aqt.mw.form.menuTools.addAction(action)        
+    aqt.mw.form.menuTools.addAction(action)
+
+    action = aqt.qt.QAction('AudioCards: Settings', aqt.mw)
+    action.triggered.connect(show_settings_action)
+    aqt.mw.form.menuTools.addAction(action)
