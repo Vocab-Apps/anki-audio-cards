@@ -131,24 +131,22 @@ class SettingsDialog(QDialog):
 
     def setup_ui(self):
         self.setWindowTitle("AudioCards: Settings")
+        self.setMinimumWidth(500)
         layout = QVBoxLayout()
 
         api_key_layout = QHBoxLayout()
         api_key_label = QLabel("API key:")
         self.api_key_edit = QLineEdit()
-        self.api_key_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self.api_key_edit.setText(anki_interface.get_api_key() or "")
-        api_key_layout.addWidget(api_key_label)
-        api_key_layout.addWidget(self.api_key_edit)
-        layout.addLayout(api_key_layout)
-
-        validate_layout = QHBoxLayout()
         self.validate_button = QPushButton("Validate")
         self.validate_button.clicked.connect(self._on_validate)
+        api_key_layout.addWidget(api_key_label)
+        api_key_layout.addWidget(self.api_key_edit, 1)
+        api_key_layout.addWidget(self.validate_button)
+        layout.addLayout(api_key_layout)
+
         self.status_label = QLabel("")
-        validate_layout.addWidget(self.validate_button)
-        validate_layout.addWidget(self.status_label)
-        layout.addLayout(validate_layout)
+        layout.addWidget(self.status_label)
 
         button_layout = QHBoxLayout()
         ok_button = QPushButton("OK")
