@@ -153,8 +153,10 @@ class SettingsDialog(QDialog):
         cancel_button = QPushButton("Cancel")
         ok_button.clicked.connect(self.accept)
         cancel_button.clicked.connect(self.reject)
+        button_layout.addStretch()
         button_layout.addWidget(ok_button)
         button_layout.addWidget(cancel_button)
+        button_layout.addStretch()
         layout.addLayout(button_layout)
 
         self.setLayout(layout)
