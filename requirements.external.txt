@@ -1,0 +1,2 @@
+# these modules get bundled into the external directory in hypertts
+sentry_sdk
