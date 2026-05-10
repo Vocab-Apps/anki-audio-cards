@@ -22,16 +22,22 @@ from . import logic
 from . import debug_data
 
 
+def _make_progress_callback():
+    def update_label(text: str):
+        mw.taskman.run_on_main(lambda: mw.progress.update(label=text))
+    return update_label
+
 def sync_all_decks_fn(browser):
     def sync_all_decks():
-        logic.sync_all_decks_with_audiocards()
+        logic.sync_all_decks_with_audiocards(_make_progress_callback())
     return sync_all_decks
 
 def sync_all_decks_action():
     logger.info('starting to sync all decks')
+    progress_callback = _make_progress_callback()
     op = QueryOp(
         parent=mw,
-        op=lambda col: logic.sync_all_decks_with_audiocards(),
+        op=lambda col: logic.sync_all_decks_with_audiocards(progress_callback),
         success=lambda result: None,
     )
     op.with_progress(label='Syncing all decks with AudioCards...').run_in_background()
@@ -42,9 +48,15 @@ def register_new_deck():
     if new_deck_subset is None:
         return
 
+    progress_callback = _make_progress_callback()
+
+    def register_and_sync(col):
+        logic.create_deck_subset(new_deck_subset, progress_callback)
+        logic.sync_all_decks_with_audiocards(progress_callback)
+
     op = QueryOp(
         parent=mw,
-        op=lambda col: logic.create_deck_subset(new_deck_subset),
+        op=register_and_sync,
         success=lambda result: None,
     )
     op.with_progress(label='Registering new deck with AudioCards...').run_in_background()

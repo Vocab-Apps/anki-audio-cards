@@ -16,8 +16,14 @@ def get_api_instance():
     audiocards_api = api.AudioCardsAPI(api_key)
     return audiocards_api    
 
-def sync_all_decks_with_audiocards():
+def _noop_progress(_text: str):
+    pass
+
+def sync_all_decks_with_audiocards(progress_callback=None):
+    progress_callback = progress_callback or _noop_progress
+
     # first, query the audiocards api for the list of decks
+    progress_callback('Fetching deck list from AudioCards...')
     api_key = anki_interface.get_api_key()
     audiocards_api = api.AudioCardsAPI(api_key)
 
@@ -40,17 +46,21 @@ def sync_all_decks_with_audiocards():
             anki_deck_id = deck_subset.anki_deck_id
             if anki_deck_id in deck_map:
                 deck_name = deck_map[anki_deck_id]
-                sync_deck(audiocards_api, deck_name, deck_subset, update_version)
+                progress_callback(f'Syncing deck: {deck_name}')
+                sync_deck(audiocards_api, deck_name, deck_subset, update_version, progress_callback)
             logger.info(f'finished syncing deck subset: {deck_subset}')
 
         # signal done status after all decks are synced
+        progress_callback('Finalizing sync with AudioCards...')
         audiocards_api.deck_update(api.DeckUpdateStatus.DONE, update_version)
     except Exception as e:
         logger.exception(f'error syncing decks: {e}')
         audiocards_api.deck_update(api.DeckUpdateStatus.ERROR, update_version, str(e))
         raise e
 
-def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset, update_version: int):
+def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset, update_version: int, progress_callback=None):
+    progress_callback = progress_callback or _noop_progress
+
     if deck_subset.anki_due_cards:
         # for now we only support syncing due cards
         logger.info('configured to sync due cards')
@@ -60,12 +70,14 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset, updat
         logger.info(f'browser query: [{browser_query}]')
 
         # query existing card formats
+        progress_callback(f'{deck_name}: querying card formats...')
         card_formats = audiocards_api.list_deck_card_formats(deck_subset.deck)
         card_format_map = anki_interface.get_card_format_map(card_formats)
 
         # do we have any unknown card formats?
         for card_format in anki_interface.iterate_unkown_card_formats(browser_query, card_format_map):
             logger.info(f'unknown card format: {card_format}, need to create the format')
+            progress_callback(f'{deck_name}: registering new card format...')
             template_name, front_template, back_template = anki_interface.get_card_templates(card_format)
             field_samples = anki_interface.get_card_samples(deck_name, card_format)
             # logger.info(f'front template: {front_template}, back template: {back_template}')
@@ -87,18 +99,23 @@ def sync_deck(audiocards_api, deck_name: str, deck_subset: api.DeckSubset, updat
         card_format_map = anki_interface.get_card_format_map(card_formats)
 
         # iterate over due cards in slices
+        uploaded = 0
         for card_data_list in anki_interface.iterate_due_cards_slices(deck_name, card_format_map, api.AudioCardsAPI.UPDATE_MAX_CARD_NUM):
             logger.debug(f'detailed card data: {pprint.pformat(card_data_list)}')
+            uploaded += len(card_data_list)
+            progress_callback(f'{deck_name}: uploading cards ({uploaded} so far)...')
             response = audiocards_api.create_update_cards(deck_subset.id, update_version, card_data_list)
-            
+
 
 def get_new_deck_subset_from_dialog():
     logger.info('registering new deck')
     deck_list: List[anki_interface.Deck] = anki_interface.get_deck_list()
     return dialogs.create_deck_subset(deck_list)
 
-def create_deck_subset(new_deck_subset):
+def create_deck_subset(new_deck_subset, progress_callback=None):
+    progress_callback = progress_callback or _noop_progress
     logger.info(f'create deck subset result: {pprint.pformat(new_deck_subset)}')
+    progress_callback(f'Registering deck: {new_deck_subset.deck_name}...')
     audiocards_api = get_api_instance()
     query_result = audiocards_api.new_deck_subset(new_deck_subset)
     logger.info(f'created deck subset: {query_result}')
