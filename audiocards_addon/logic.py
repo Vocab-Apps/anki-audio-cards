@@ -115,8 +115,13 @@ def get_new_deck_subset_from_dialog():
 def create_deck_subset(new_deck_subset, progress_callback=None):
     progress_callback = progress_callback or _noop_progress
     logger.info(f'create deck subset result: {pprint.pformat(new_deck_subset)}')
-    progress_callback(f'Registering deck: {new_deck_subset.deck_name}...')
+
+    progress_callback('Connecting to AudioCards...')
     audiocards_api = get_api_instance()
+
+    progress_callback(f'Sending registration for deck "{new_deck_subset.deck_name}"...')
     query_result = audiocards_api.new_deck_subset(new_deck_subset)
     logger.info(f'created deck subset: {query_result}')
+
+    progress_callback(f'Deck "{new_deck_subset.deck_name}" registered, preparing full sync...')
     return query_result
