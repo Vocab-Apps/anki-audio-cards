@@ -10,7 +10,6 @@ LOGGER_NAME = 'audiocards'
 LOGGER_NAME_TEST = 'test_audiocards'
 
 VOCABAI_API_HOSTNAME = 'app.vocabai.app'
-VOCABAI_API_BASE_URL = 'https://app.vocabai.app/audiocards-api/v1'
 
 # maximum number of days ahead when looking for due cards
 MAX_DAYS_AHEAD = 10
