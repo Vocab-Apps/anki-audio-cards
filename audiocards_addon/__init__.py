@@ -31,13 +31,16 @@ else:
     # ============================
 
     if hasattr(sys, '_sentry_crash_reporting'):
+        from . import version
         sentry_sdk.init(
             dsn="https://b5dc1da8235cac3c2619ce29a9a82d15@o968582.ingest.us.sentry.io/4511298044690432",
             traces_sample_rate=1.0,
+            release=f'anki-audio-cards@{version.AUDIOCARDS_VERSION}',
             # Add data like request headers and IP for users,
             # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
             send_default_pii=True,
         )
+        sentry_sdk.set_tag("audiocards_version", version.AUDIOCARDS_VERSION)
     else:
         logger.info('disabling crash reporting')
 
