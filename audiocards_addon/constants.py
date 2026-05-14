@@ -9,7 +9,7 @@ ENV_VAR_LOGGING_LEVEL = 'AUDIOCARDS_LOGGING_LEVEL'
 LOGGER_NAME = 'audiocards'
 LOGGER_NAME_TEST = 'test_audiocards'
 
-VOCABAI_API_HOSTNAME = 'app.vocabai.app'
+VOCABAI_API_HOSTNAME = 'app.vocab.ai'
 
 # maximum number of days ahead when looking for due cards
 MAX_DAYS_AHEAD = 10
