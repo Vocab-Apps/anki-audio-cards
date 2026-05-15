@@ -23,14 +23,13 @@ class CardFormat:
     card_ord: int
 
 def get_api_key():
-    config = aqt.mw.addonManager.getConfig('anki-audio-cards')
-    vocabai_api_key = config['api_key']
-    return vocabai_api_key
+    config = aqt.mw.addonManager.getConfig(constants.ADDON_PACKAGE_NAME) or {}
+    return config.get('api_key')
 
 def set_api_key(api_key: str):
-    config = aqt.mw.addonManager.getConfig('anki-audio-cards') or {}
+    config = aqt.mw.addonManager.getConfig(constants.ADDON_PACKAGE_NAME) or {}
     config['api_key'] = api_key
-    aqt.mw.addonManager.writeConfig('anki-audio-cards', config)
+    aqt.mw.addonManager.writeConfig(constants.ADDON_PACKAGE_NAME, config)
 
 def get_deck_list() -> List[Deck]:
     deck_list = aqt.mw.col.decks.all_names_and_ids()
