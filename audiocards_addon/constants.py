@@ -1,4 +1,4 @@
-
+import os
 
 ENABLE_SENTRY_CRASH_REPORTING = True
 
@@ -9,7 +9,13 @@ ENV_VAR_LOGGING_LEVEL = 'AUDIOCARDS_LOGGING_LEVEL'
 LOGGER_NAME = 'audiocards'
 LOGGER_NAME_TEST = 'test_audiocards'
 
-ADDON_PACKAGE_NAME = 'anki-audio-cards'
+# Anki names the installed addon directory by its manifest "package" value
+# ('audiocards'), or by the numeric AnkiWeb id, or 'anki-audio-cards' in a dev
+# symlink setup -- never reliably by the git folder name. Derive the real
+# package name from this file's on-disk location so addonManager can locate
+# meta.json. Hardcoding it broke writeConfig/getConfig for real installs
+# (Sentry ANKI-AUDIO-CARDS-2 / ANKI-AUDIO-CARDS-3).
+ADDON_PACKAGE_NAME = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
 
 VOCABAI_API_HOSTNAME = 'app.vocab.ai'
 
