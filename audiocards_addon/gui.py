@@ -8,7 +8,7 @@ import aqt
 # import the main window object (mw) from aqt
 from aqt import mw
 # import the "show info" tool from utils.py
-from aqt.utils import showInfo, qconnect
+from aqt.utils import showInfo, showCritical, qconnect
 from aqt.operations import QueryOp
 # import all of the Qt GUI library
 from aqt.qt import *
@@ -20,6 +20,15 @@ logger = logging_utils.get_child_logger(__name__)
 
 from . import logic
 from . import debug_data
+from . import anki_interface
+from . import constants
+
+
+def _check_api_key() -> bool:
+    if not anki_interface.get_api_key():
+        showCritical(constants.API_KEY_MISSING_MESSAGE, title='AudioCards')
+        return False
+    return True
 
 
 def _make_progress_callback():
@@ -29,11 +38,15 @@ def _make_progress_callback():
 
 def sync_all_decks_fn(browser):
     def sync_all_decks():
+        if not _check_api_key():
+            return
         logic.sync_all_decks_with_audiocards(_make_progress_callback())
     return sync_all_decks
 
 def sync_all_decks_action():
     logger.info('starting to sync all decks')
+    if not _check_api_key():
+        return
     progress_callback = _make_progress_callback()
     op = QueryOp(
         parent=mw,
@@ -44,6 +57,8 @@ def sync_all_decks_action():
 
 def register_new_deck():
     logger.info('registering new deck')
+    if not _check_api_key():
+        return
     new_deck_subset = logic.get_new_deck_subset_from_dialog()
     if new_deck_subset is None:
         return

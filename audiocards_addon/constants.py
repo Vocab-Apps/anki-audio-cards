@@ -23,3 +23,8 @@ VOCABAI_API_HOSTNAME = 'app.vocab.ai'
 MAX_DAYS_AHEAD = 10
 # minimum number of cards we want in a due set
 MIN_CARDS = 100
+
+API_KEY_MISSING_MESSAGE = (
+    'AudioCards API key is not configured. '
+    'Please set it via Tools > AudioCards: Settings.'
+)
