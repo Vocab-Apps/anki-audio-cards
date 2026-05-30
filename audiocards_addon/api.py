@@ -67,7 +67,7 @@ class AudioCardsAPI:
 
     def list_deck_subsets(self) -> List[DeckSubset]:
         url = f'{self.BASE_URL}/list_deck_subsets'
-        response = requests.get(url, headers=self.get_headers())
+        response = requests.get(url, headers=self.get_headers(), timeout=constants.REQUEST_TIMEOUT_SECONDS)
         response.raise_for_status()
         data = response.json()
         results = []
@@ -77,7 +77,7 @@ class AudioCardsAPI:
 
     def list_deck_card_formats(self, deck_id: str) -> List[DeckCardFormat]:
         url = f'{self.BASE_URL}/list_deck_card_formats/{deck_id}'
-        response = requests.get(url, headers=self.get_headers())
+        response = requests.get(url, headers=self.get_headers(), timeout=constants.REQUEST_TIMEOUT_SECONDS)
         response.raise_for_status()
         data = response.json()
         logger.debug(f'deck card format: {pprint.pformat(data)}')
@@ -97,9 +97,10 @@ class AudioCardsAPI:
             'cards': card_data_list
         }
         logger.info(f'calling create_update_cards API with {len(card_data_list)} cards')
-        response = requests.post(url, 
-            json=request_data, 
-            headers=self.get_headers())
+        response = requests.post(url,
+            json=request_data,
+            headers=self.get_headers(),
+            timeout=constants.REQUEST_TIMEOUT_SECONDS)
         response.raise_for_status()
         return response.json()
 
@@ -115,9 +116,10 @@ class AudioCardsAPI:
             'anki_card_filter': new_deck_subset.anki_card_filter
         }
 
-        response = requests.post(url, 
-            json=request_data, 
-            headers=self.get_headers())
+        response = requests.post(url,
+            json=request_data,
+            headers=self.get_headers(),
+            timeout=constants.REQUEST_TIMEOUT_SECONDS)
         response.raise_for_status()
         return response.json()
 
@@ -138,7 +140,8 @@ class AudioCardsAPI:
 
         response = requests.post(url,
             json=request_data,
-            headers=self.get_headers())
+            headers=self.get_headers(),
+            timeout=constants.REQUEST_TIMEOUT_SECONDS)
         if response.status_code != 201:
             logger.error(f'error creating deck card format: {response.status_code} {response.text}')
         response.raise_for_status()
@@ -155,7 +158,8 @@ class AudioCardsAPI:
         logger.info(f'calling deck_update API with status={status}, update_version={update_version}')
         response = requests.patch(url,
             json=request_data,
-            headers=self.get_headers())
+            headers=self.get_headers(),
+            timeout=constants.REQUEST_TIMEOUT_SECONDS)
         response.raise_for_status()
         return response.json()
 

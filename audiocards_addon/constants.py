@@ -19,6 +19,9 @@ ADDON_PACKAGE_NAME = os.path.basename(os.path.dirname(os.path.dirname(__file__))
 
 VOCABAI_API_HOSTNAME = 'app.vocab.ai'
 
+# timeout (in seconds) for all HTTP requests to the AudioCards API
+REQUEST_TIMEOUT_SECONDS = 60
+
 # maximum number of days ahead when looking for due cards
 MAX_DAYS_AHEAD = 10
 # minimum number of cards we want in a due set
