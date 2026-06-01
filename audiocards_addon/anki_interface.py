@@ -119,7 +119,7 @@ def get_card_format_map(card_formats: List[api.DeckCardFormat]) -> dict:
 def get_due_cards_browser_query(deck_name: str, days_ahead: int) -> str:
     # this retrieves due cards and new cards, and excludes suspended/buried cards
     # deck:Cantonese (is:due OR is:new OR prop:due<=0) -is:suspended -is:buried
-    return f"deck:{deck_name} (is:due OR is:new OR prop:due<={days_ahead}) -is:suspended -is:buried"
+    return f"\"deck:{deck_name}\" (is:due OR is:new OR prop:due<={days_ahead}) -is:suspended -is:buried"
 
 
 def iterate_due_cards_slices(deck_name:str, card_format_map, max_items):
