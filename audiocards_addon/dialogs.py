@@ -1,7 +1,7 @@
 import aqt
-from aqt import (QDialog, QComboBox, QVBoxLayout, QHBoxLayout, 
-                           QRadioButton, QLineEdit, QLabel, QPushButton, 
-                           QButtonGroup)
+from aqt import (QDialog, QComboBox, QVBoxLayout, QHBoxLayout,
+                           QRadioButton, QLineEdit, QLabel, QPushButton,
+                           QButtonGroup, Qt)
 
 from . import logging_utils
 from . import api
@@ -9,6 +9,7 @@ from . import api
 from typing import List, Optional
 from . import anki_interface
 from . import api
+from . import version
 
 logger = logging_utils.get_child_logger(__name__)
 
@@ -133,6 +134,10 @@ class SettingsDialog(QDialog):
         self.setWindowTitle("AudioCards: Settings")
         self.setMinimumWidth(500)
         layout = QVBoxLayout()
+
+        version_label = QLabel(f"Version: {version.AUDIOCARDS_VERSION}")
+        version_label.setAlignment(Qt.AlignmentFlag.AlignRight)
+        layout.addWidget(version_label)
 
         api_key_layout = QHBoxLayout()
         api_key_label = QLabel("API key:")
