@@ -31,6 +31,7 @@ class DeckCardFormat:
     id: str
     anki_note_type_id: int
     anki_card_ord: int
+    template_name: str
 
 @dataclass
 class NewDeckSubset:
